@@ -1,0 +1,14 @@
+fastapi
+uvicorn[standard]
+xgboost
+shap
+pandas
+numpy
+scikit-learn
+scipy
+pydantic
+google-generativeai
+langgraph
+playwright
+playwright-stealth
+python-dotenv

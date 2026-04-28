@@ -1,0 +1,63 @@
+{
+  "banks_info": {
+    "SBI": { "charges_link": "https://sbi.co.in/web/interest-rates/service-charges/personal-banking" },
+    "HDFC": { "charges_link": "https://www.hdfcbank.com/personal/service-charges" },
+    "ICICI": { "charges_link": "https://www.icicibank.com/service-charges" },
+    "Axis": { "charges_link": "https://www.axisbank.com/service-charges" },
+    "Bank of Baroda": { "charges_link": "https://www.bankofbaroda.in/service-charges" }
+  },
+  "banks": ["SBI", "HDFC", "ICICI", "Axis", "Bank of Baroda"],
+  "cards": [
+    { "id": "sbi-cashback", "bank": "SBI", "icon": "🏦", "name": "SBI Cashback Card", "type": "credit", "rewards_rate": "5% cashback on online spends", "annual_fee": 999, "interest_rate": 42.0, "min_income": 25000, "joining_bonus": "₹500 cashback", "docs_required": ["PAN Card", "Aadhar Card", "Income Proof", "Passport Photo"], "official_link": "https://sbi.co.in/web/personal-banking/cards/credit-cards", "v_kyc": true },
+    { "id": "hdfc-regalia", "bank": "HDFC", "icon": "🔵", "name": "HDFC Regalia", "type": "credit", "rewards_rate": "4 reward points per ₹150", "annual_fee": 2500, "interest_rate": 40.2, "min_income": 40000, "joining_bonus": "2500 reward points", "docs_required": ["PAN Card", "Aadhar Card", "Last 3 months salary slips", "Bank statement"], "official_link": "https://www.hdfcbank.com/personal/pay/cards/credit-cards", "v_kyc": true },
+    { "id": "icici-amazon", "bank": "ICICI", "icon": "🟠", "name": "ICICI Amazon Pay Card", "type": "credit", "rewards_rate": "5% on Amazon, 2% on other", "annual_fee": 0, "interest_rate": 41.9, "min_income": 20000, "joining_bonus": "₹500 Amazon voucher", "docs_required": ["PAN Card", "Aadhar Card", "Income Proof"], "official_link": "https://www.icicibank.com/personal-banking/cards/credit-card", "v_kyc": true },
+    { "id": "axis-ace", "bank": "Axis", "icon": "🟣", "name": "Axis ACE Credit Card", "type": "credit", "rewards_rate": "5% on bill payments, 2% others", "annual_fee": 499, "interest_rate": 40.8, "min_income": 15000, "joining_bonus": "₹500 Google Pay credit", "docs_required": ["PAN Card", "Aadhar Card", "Salary Slip", "Bank Statement"], "official_link": "https://www.axisbank.com/retail/cards/credit-card", "v_kyc": true },
+    { "id": "bob-easy", "bank": "Bank of Baroda", "icon": "🟤", "name": "BOB Easy Credit Card", "type": "credit", "rewards_rate": "2 points per ₹100", "annual_fee": 0, "interest_rate": 39.6, "min_income": 10000, "joining_bonus": "Nil", "docs_required": ["PAN Card", "Aadhar Card", "Income Proof", "Passport Photo"], "official_link": "https://www.bankofbaroda.in/personal-banking/digital-products/cards/credit-cards", "v_kyc": false },
+    { "id": "sbi-debit", "bank": "SBI", "icon": "🏦", "name": "SBI Global Debit Card", "type": "debit", "rewards_rate": "Reward points on POS transactions", "annual_fee": 175, "interest_rate": 0, "min_income": 0, "joining_bonus": "Nil", "docs_required": ["Savings Account", "Aadhar Card"], "official_link": "https://sbi.co.in/web/personal-banking/cards/debit-card", "v_kyc": true },
+    { "id": "hdfc-millennia-debit", "bank": "HDFC", "icon": "🔵", "name": "HDFC Millennia Debit Card", "type": "debit", "rewards_rate": "1% cashback on online spends", "annual_fee": 500, "interest_rate": 0, "min_income": 0, "joining_bonus": "Nil", "docs_required": ["Savings Account", "KYC Documents"], "official_link": "https://www.hdfcbank.com/personal/pay/cards/debit-cards", "v_kyc": true }
+  ],
+  "loans": {
+    "home": [
+      { "id": "sbi-home", "bank": "SBI", "icon": "🏦", "name": "SBI Home Loan", "interest_rate": 8.4, "processing_fee": "0.35%", "max_tenure": 30, "min_income": 30000, "min_credit_score": 650, "min_age": 21, "max_age": 60, "docs_required": ["PAN Card", "Aadhar Card", "Last 6 months salary slips", "Bank statement (1 year)", "Property documents", "Employer ID"], "official_link": "https://sbi.co.in/web/personal-banking/loans/home-loans", "v_kyc": true },
+      { "id": "hdfc-home", "bank": "HDFC", "icon": "🔵", "name": "HDFC Home Loan", "interest_rate": 8.5, "processing_fee": "0.50%", "max_tenure": 30, "min_income": 35000, "min_credit_score": 650, "min_age": 21, "max_age": 65, "docs_required": ["PAN Card", "Aadhar Card", "Salary slips (3 months)", "Bank statement (6 months)", "Property papers", "Form 16"], "official_link": "https://www.hdfc.com/housing-loans/home-loans", "v_kyc": true },
+      { "id": "icici-home", "bank": "ICICI", "icon": "🟠", "name": "ICICI Home Loan", "interest_rate": 8.75, "processing_fee": "0.50%", "max_tenure": 30, "min_income": 30000, "min_credit_score": 700, "min_age": 23, "max_age": 62, "docs_required": ["PAN Card", "Aadhar Card", "Income proof", "Property documents", "Bank statement"], "official_link": "https://www.icicibank.com/personal-banking/loans/home-loan", "v_kyc": true }
+    ],
+    "car": [
+      { "id": "sbi-car", "bank": "SBI", "icon": "🏦", "name": "SBI Car Loan", "interest_rate": 8.85, "processing_fee": "₹1,500", "max_tenure": 7, "min_income": 20000, "min_credit_score": 600, "min_age": 21, "max_age": 65, "docs_required": ["PAN Card", "Aadhar Card", "Income Proof", "Driving License", "Proforma Invoice"], "official_link": "https://sbi.co.in/web/personal-banking/loans/auto-loans/car-loan", "v_kyc": true },
+      { "id": "hdfc-car", "bank": "HDFC", "icon": "🔵", "name": "HDFC Car Loan", "interest_rate": 9.1, "processing_fee": "0.50%", "max_tenure": 7, "min_income": 20000, "min_credit_score": 650, "min_age": 21, "max_age": 65, "docs_required": ["PAN Card", "Aadhar Card", "Salary slips", "Bank statement", "Vehicle quotation"], "official_link": "https://www.hdfcbank.com/personal/borrow/popular-loans/car-loan", "v_kyc": true },
+      { "id": "axis-car", "bank": "Axis", "icon": "🟣", "name": "Axis Car Loan", "interest_rate": 9.2, "processing_fee": "₹2,500", "max_tenure": 7, "min_income": 18000, "min_credit_score": 600, "min_age": 21, "max_age": 70, "docs_required": ["PAN Card", "Aadhar Card", "Income proof", "Car quotation"], "official_link": "https://www.axisbank.com/retail/loans/car-loan", "v_kyc": false }
+    ],
+    "education": [
+      { "id": "sbi-edu", "bank": "SBI", "icon": "🏦", "name": "SBI Student Loan", "interest_rate": 8.15, "processing_fee": "Nil", "max_tenure": 15, "min_income": 0, "min_credit_score": 0, "min_age": 16, "max_age": 35, "docs_required": ["Admission letter", "Fee structure", "Mark sheets", "Co-borrower income proof", "Aadhar Card"], "official_link": "https://sbi.co.in/web/personal-banking/loans/education-loans/student-loan-scheme", "v_kyc": true },
+      { "id": "bob-edu", "bank": "Bank of Baroda", "icon": "🟤", "name": "BOB Education Loan", "interest_rate": 8.35, "processing_fee": "₹1,000", "max_tenure": 15, "min_income": 0, "min_credit_score": 0, "min_age": 16, "max_age": 35, "docs_required": ["Admission letter", "Fee receipt", "Academic records", "Co-borrower KYC", "Income proof"], "official_link": "https://www.bankofbaroda.in/personal-banking/loans/education-loan", "v_kyc": false },
+      { "id": "icici-edu", "bank": "ICICI", "icon": "🟠", "name": "ICICI Education Loan", "interest_rate": 9.0, "processing_fee": "1%", "max_tenure": 10, "min_income": 0, "min_credit_score": 0, "min_age": 16, "max_age": 35, "docs_required": ["Admission letter", "Fee structure", "Marksheets", "KYC documents"], "official_link": "https://www.icicibank.com/personal-banking/loans/education-loan", "v_kyc": true }
+    ],
+    "personal": [
+      { "id": "hdfc-personal", "bank": "HDFC", "icon": "🔵", "name": "HDFC Personal Loan", "interest_rate": 10.5, "processing_fee": "1.00%", "max_tenure": 5, "min_income": 25000, "min_credit_score": 700, "min_age": 21, "max_age": 58, "docs_required": ["PAN Card", "Aadhar Card", "Salary slips (3 months)", "Bank statement (6 months)"], "official_link": "https://www.hdfcbank.com/personal/borrow/popular-loans/personal-loan", "v_kyc": true },
+      { "id": "icici-personal", "bank": "ICICI", "icon": "🟠", "name": "ICICI Personal Loan", "interest_rate": 10.75, "processing_fee": "1.50%", "max_tenure": 5, "min_income": 20000, "min_credit_score": 700, "min_age": 23, "max_age": 58, "docs_required": ["PAN Card", "Aadhar Card", "Income proof", "Bank statement"], "official_link": "https://www.icicibank.com/personal-banking/loans/personal-loan", "v_kyc": true },
+      { "id": "sbi-personal", "bank": "SBI", "icon": "🏦", "name": "SBI Personal Loan", "interest_rate": 11.0, "processing_fee": "1.00%", "max_tenure": 6, "min_income": 15000, "min_credit_score": 650, "min_age": 21, "max_age": 58, "docs_required": ["PAN Card", "Aadhar Card", "Salary slips", "Bank statement", "Form 16"], "official_link": "https://sbi.co.in/web/personal-banking/loans/personal-loans", "v_kyc": true }
+    ]
+  },
+  "savings": {
+    "fd": [
+      { "id": "sbi-fd", "bank": "SBI", "icon": "🏦", "name": "SBI Fixed Deposit", "interest_rate": 7.1, "senior_rate": 7.6, "min_deposit": 1000, "max_tenure_years": 10, "compounding": "Quarterly", "official_link": "https://sbi.co.in/web/interest-rates/deposit-rates/retail-domestic-term-deposits", "v_kyc": true },
+      { "id": "hdfc-fd", "bank": "HDFC", "icon": "🔵", "name": "HDFC Fixed Deposit", "interest_rate": 7.25, "senior_rate": 7.75, "min_deposit": 5000, "max_tenure_years": 10, "compounding": "Quarterly", "official_link": "https://www.hdfcbank.com/personal/save/deposits/fixed-deposit", "v_kyc": true },
+      { "id": "icici-fd", "bank": "ICICI", "icon": "🟠", "name": "ICICI Fixed Deposit", "interest_rate": 7.1, "senior_rate": 7.6, "min_deposit": 5000, "max_tenure_years": 10, "compounding": "Quarterly", "official_link": "https://www.icicibank.com/personal-banking/deposits/fixed-deposit", "v_kyc": true }
+    ],
+    "rd": [
+      { "id": "sbi-rd", "bank": "SBI", "icon": "🏦", "name": "SBI Recurring Deposit", "interest_rate": 6.8, "min_deposit": 100, "max_tenure_months": 120, "interest_credit": "Quarterly", "official_link": "https://sbi.co.in/web/personal-banking/deposits/recurring-deposit", "v_kyc": true },
+      { "id": "hdfc-rd", "bank": "HDFC", "icon": "🔵", "name": "HDFC Recurring Deposit", "interest_rate": 7.0, "min_deposit": 1000, "max_tenure_months": 120, "interest_credit": "Monthly", "official_link": "https://www.hdfcbank.com/personal/save/deposits/recurring-deposit", "v_kyc": true },
+      { "id": "bob-rd", "bank": "Bank of Baroda", "icon": "🟤", "name": "BOB Recurring Deposit", "interest_rate": 6.85, "min_deposit": 500, "max_tenure_months": 60, "interest_credit": "Quarterly", "official_link": "https://www.bankofbaroda.in/personal-banking/deposits/recurring-deposit", "v_kyc": false }
+    ],
+    "insurance": [
+      { "id": "sbi-life-shield", "bank": "SBI", "icon": "🏦", "name": "SBI Life Shield", "type": "Term Life", "cover": "₹1 Cr", "premium_from": "₹550/month", "claim_ratio": "96.4%", "official_link": "https://www.sbilife.co.in/en/term-insurance" },
+      { "id": "hdfc-click2protect", "bank": "HDFC", "icon": "🔵", "name": "HDFC Click 2 Protect", "type": "Term Life", "cover": "₹1 Cr", "premium_from": "₹490/month", "claim_ratio": "98.7%", "official_link": "https://www.hdfclife.com/term-insurance-plans" },
+      { "id": "icici-iprotect", "bank": "ICICI", "icon": "🟠", "name": "ICICI iProtect Smart", "type": "Term Life", "cover": "₹1 Cr", "premium_from": "₹520/month", "claim_ratio": "97.9%", "official_link": "https://www.iciciprulife.com/term-insurance-plans.html" }
+    ]
+  },
+  "forex_base_rates": {
+    "USD": 83.50, "EUR": 91.20, "GBP": 106.30, "JPY": 0.56,
+    "AED": 22.74, "SGD": 63.10, "CAD": 62.40, "AUD": 55.80,
+    "CHF": 95.60, "THB": 2.38
+  }
+}
