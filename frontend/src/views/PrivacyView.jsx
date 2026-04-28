@@ -6,6 +6,11 @@ const PrivacyView = () => {
   const [purposeData, setPurposeData] = useState(null);
   const [erasureStatus, setErasureStatus] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  
+  // Track which optional consents are active
+  const [activeConsents, setActiveConsents] = useState({
+    'Marketing': true
+  });
 
   useEffect(() => {
     fetch(`${API_BASE}/compliance/purpose_limitation`)
@@ -56,18 +61,57 @@ const PrivacyView = () => {
             <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-secondary)' }}>Loading privacy map...</div>
           ) : purposeData ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              {Object.entries(purposeData.Mapping).map(([purpose, fields]) => (
-                <div key={purpose} style={{ background: 'rgba(255,255,255,0.03)', padding: '1rem', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                  <h3 style={{ fontSize: '0.95rem', fontWeight: 600, color: 'var(--accent-teal)', marginBottom: '0.5rem' }}>{purpose}</h3>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
-                    {fields.map(field => (
-                      <span key={field} className="badge info" style={{ fontSize: '0.7rem', padding: '0.25rem 0.5rem', background: 'rgba(59, 130, 246, 0.1)' }}>
-                        {field.replace(/_/g, ' ')}
-                      </span>
-                    ))}
+              {Object.entries(purposeData.Mapping).map(([purpose, fields]) => {
+                const isEssential = purpose === 'Credit Scoring' || purpose === 'Identity Verification';
+                const isConsented = isEssential ? true : activeConsents[purpose];
+                
+                return (
+                  <div key={purpose} style={{ 
+                    background: isConsented ? 'rgba(255,255,255,0.03)' : 'rgba(255,255,255,0.01)', 
+                    padding: '1rem', 
+                    borderRadius: '10px', 
+                    border: isConsented ? '1px solid rgba(255,255,255,0.05)' : '1px dashed rgba(255,255,255,0.1)',
+                    opacity: isConsented ? 1 : 0.6,
+                    transition: 'all 0.3s ease'
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
+                      <h3 style={{ fontSize: '0.95rem', fontWeight: 600, color: 'var(--accent-teal)' }}>{purpose}</h3>
+                      
+                      {isEssential ? (
+                        <span className="badge" style={{ background: 'rgba(245, 158, 11, 0.1)', color: 'var(--warning)', fontSize: '0.65rem' }}>
+                          🔒 Essential for Service
+                        </span>
+                      ) : (
+                        <button 
+                          onClick={() => setActiveConsents(prev => ({ ...prev, [purpose]: !prev[purpose] }))}
+                          style={{ 
+                            background: isConsented ? 'rgba(239, 68, 68, 0.1)' : 'rgba(16, 185, 129, 0.1)',
+                            color: isConsented ? 'var(--danger)' : 'var(--success)',
+                            border: `1px solid ${isConsented ? 'rgba(239, 68, 68, 0.2)' : 'rgba(16, 185, 129, 0.2)'}`,
+                            padding: '0.3rem 0.6rem', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 600, cursor: 'pointer'
+                          }}
+                        >
+                          {isConsented ? 'Revoke Consent' : 'Grant Consent'}
+                        </button>
+                      )}
+                    </div>
+                    
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
+                      {fields.map(field => (
+                        <span key={field} className="badge info" style={{ fontSize: '0.7rem', padding: '0.25rem 0.5rem', background: 'rgba(59, 130, 246, 0.1)' }}>
+                          {field.replace(/_/g, ' ')}
+                        </span>
+                      ))}
+                    </div>
+                    
+                    {!isEssential && !isConsented && (
+                      <div style={{ fontSize: '0.75rem', color: 'var(--danger)', marginTop: '0.75rem', fontStyle: 'italic' }}>
+                        Consent revoked. This data will no longer be used for {purpose.toLowerCase()}.
+                      </div>
+                    )}
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           ) : (
             <div style={{ color: 'var(--danger)' }}>Failed to load compliance data.</div>
