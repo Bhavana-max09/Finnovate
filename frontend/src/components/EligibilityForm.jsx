@@ -8,6 +8,7 @@ const STEPS = [
   { label: 'Personal', icon: '👤' },
   { label: 'Financial', icon: '💰' },
   { label: 'Credit', icon: '⭐' },
+  { label: 'Documents', icon: '📄' },
   { label: 'Results', icon: '📋' },
 ];
 
@@ -16,16 +17,23 @@ const EligibilityForm = () => {
   const [profile, setProfile] = useState({
     age: 30, employment: 'Salaried', monthly_income: 50000,
     existing_emi: 0, credit_score: 750, loan_history: 'Good',
+    loan_amount: 500000,
   });
   const [aiResult, setAiResult] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [docsStatus, setDocsStatus] = useState(null);
+  
+  // What-If Simulator states
+  const [whatIfIncome, setWhatIfIncome] = useState(50000);
+  const [whatIfLoan, setWhatIfLoan] = useState(500000);
+  const [whatIfResult, setWhatIfResult] = useState(null);
 
   const handleChange = (e) => {
     const { name, value, type } = e.target;
     setProfile(p => ({ ...p, [name]: type === 'number' || type === 'range' ? parseFloat(value) : value }));
   };
 
-  const next = () => setStep(s => Math.min(s + 1, 3));
+  const next = () => setStep(s => Math.min(s + 1, 4));
   const prev = () => setStep(s => Math.max(s - 1, 0));
 
   const handleCheckEligibility = async () => {
@@ -36,13 +44,16 @@ const EligibilityForm = () => {
         DAYS_BIRTH: -profile.age * 365,
         CODE_GENDER: "F",
         AMT_INCOME_TOTAL: profile.monthly_income * 12,
-        AMT_CREDIT: 500000,
+        AMT_CREDIT: profile.loan_amount,
         ZIP_CODE: "10001",
         NAME_EDUCATION_TYPE: "Higher education",
         EXT_SOURCE_1: profile.credit_score / 900,
         EXT_SOURCE_2: profile.credit_score / 900,
         EXT_SOURCE_3: profile.credit_score / 900,
       };
+
+      setWhatIfIncome(profile.monthly_income);
+      setWhatIfLoan(profile.loan_amount);
 
       const response = await fetch(`${API_BASE}/predict`, {
         method: 'POST',
@@ -60,7 +71,51 @@ const EligibilityForm = () => {
       setAiResult({ error: "Failed to connect to AI Underwriter backend." });
     }
     setIsLoading(false);
-    setStep(3);
+    setStep(4);
+  };
+
+  const handleSimulateWhatIf = async () => {
+    try {
+      const applicantData = {
+        DAYS_BIRTH: -profile.age * 365,
+        CODE_GENDER: "F",
+        AMT_INCOME_TOTAL: whatIfIncome * 12,
+        AMT_CREDIT: whatIfLoan,
+        ZIP_CODE: "10001",
+        NAME_EDUCATION_TYPE: "Higher education",
+        EXT_SOURCE_1: profile.credit_score / 900,
+        EXT_SOURCE_2: profile.credit_score / 900,
+        EXT_SOURCE_3: profile.credit_score / 900,
+      };
+
+      const response = await fetch(`${API_BASE}/simulate_what_if`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(applicantData)
+      });
+      if (response.ok) {
+        setWhatIfResult(await response.json());
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const simulateDocumentUpload = () => {
+    setIsLoading(true);
+    setDocsStatus('uploading');
+    setTimeout(() => {
+      fetch(`${API_BASE}/verify_documents`, { method: 'POST' })
+        .then(res => res.json())
+        .then(data => {
+          setDocsStatus(data);
+          setIsLoading(false);
+        })
+        .catch(err => {
+          setDocsStatus({ error: true });
+          setIsLoading(false);
+        });
+    }, 1500);
   };
 
   const getResults = () => {
@@ -125,11 +180,15 @@ const EligibilityForm = () => {
       {step === 1 && (
         <div className="glass-card">
           <h2>💰 Financial Information</h2>
-          <p className="card-subtitle">Your income and existing obligations.</p>
+          <p className="card-subtitle">Your income and loan requirements.</p>
           <div className="grid-2" style={{ gap: '1rem', marginTop: '1.25rem' }}>
             <div className="form-group">
               <label className="form-label">Monthly Income (₹) — ₹{profile.monthly_income.toLocaleString()}</label>
               <input type="range" name="monthly_income" min="5000" max="500000" step="1000" value={profile.monthly_income} onChange={handleChange} />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Requested Loan Amount (₹) — ₹{profile.loan_amount.toLocaleString()}</label>
+              <input type="range" name="loan_amount" min="10000" max="5000000" step="10000" value={profile.loan_amount} onChange={handleChange} />
             </div>
             <div className="form-group">
               <label className="form-label">Existing Monthly EMI (₹)</label>
@@ -168,15 +227,49 @@ const EligibilityForm = () => {
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1.5rem' }}>
             <button className="btn-primary" onClick={prev} style={{ background: 'rgba(255,255,255,0.05)', boxShadow: 'none' }}><ArrowLeft size={16} /> Back</button>
+            <button className="btn-primary" onClick={next}>Next <ArrowRight size={16} /></button>
+          </div>
+        </div>
+      )}
+
+      {/* Step 3: Documents */}
+      {step === 3 && (
+        <div className="glass-card">
+          <h2>📄 E-KYC Document Upload</h2>
+          <p className="card-subtitle">Fast, AI-powered document verification.</p>
+          
+          <div style={{ border: '2px dashed rgba(255,255,255,0.1)', borderRadius: '12px', padding: '2rem', textAlign: 'center', marginTop: '1.5rem', background: 'rgba(255,255,255,0.02)' }}>
+            <FileText size={48} color="var(--accent-primary)" style={{ margin: '0 auto 1rem', opacity: 0.8 }} />
+            <h3 style={{ marginBottom: '0.5rem', fontWeight: 600 }}>Drop your Aadhar & PAN Cards here</h3>
+            <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>Securely encrypted and verified against government databases.</p>
+            
+            {docsStatus?.uploading ? (
+              <div style={{ color: 'var(--accent-teal)' }}>Uploading & Scanning...</div>
+            ) : docsStatus?.kyc_status ? (
+              <div style={{ background: 'rgba(16, 185, 129, 0.1)', border: '1px solid var(--success)', padding: '1rem', borderRadius: '8px' }}>
+                <h4 style={{ color: 'var(--success)', fontWeight: 700, marginBottom: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+                  <CheckCircle size={18} /> KYC Verified Successfully
+                </h4>
+                <p style={{ fontSize: '0.85rem' }}>Genuineness Score: <strong>{docsStatus.genuineness_score}%</strong></p>
+              </div>
+            ) : (
+              <button className="btn-primary" onClick={simulateDocumentUpload} disabled={isLoading}>
+                {isLoading ? 'Verifying...' : 'Simulate Upload & Verify'}
+              </button>
+            )}
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1.5rem' }}>
+            <button className="btn-primary" onClick={prev} style={{ background: 'rgba(255,255,255,0.05)', boxShadow: 'none' }}><ArrowLeft size={16} /> Back</button>
             <button className="btn-primary" onClick={handleCheckEligibility} disabled={isLoading}>
-              {isLoading ? 'Checking...' : <>Check Eligibility <ArrowRight size={16} /></>}
+              {isLoading ? 'Checking...' : <>Check Final Eligibility <ArrowRight size={16} /></>}
             </button>
           </div>
         </div>
       )}
 
-      {/* Step 3: Results */}
-      {step === 3 && (
+      {/* Step 4: Results */}
+      {step === 4 && (
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
             <h2 style={{ fontSize: '1.1rem', fontWeight: 700 }}>📋 Your Eligibility Results</h2>
@@ -214,6 +307,46 @@ const EligibilityForm = () => {
                       </ul>
                     </div>
                   )}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Interactive What-If Simulator for Rejected Users */}
+          {aiResult && !aiResult.approved && !aiResult.error && (
+            <div className="glass-card" style={{ marginBottom: '1.5rem', background: 'rgba(245, 158, 11, 0.05)', border: '1px solid rgba(245, 158, 11, 0.3)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+                <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--warning)' }}>🎚️ What-If Simulator: Path to Approval</h3>
+              </div>
+              <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>
+                Adjust your application parameters below to see what it would take for the AI to approve you.
+              </p>
+              
+              <div className="grid-2" style={{ gap: '1.5rem' }}>
+                <div className="form-group">
+                  <label className="form-label">Lower Loan Amount: ₹{whatIfLoan.toLocaleString()}</label>
+                  <input type="range" min="10000" max="5000000" step="10000" value={whatIfLoan} onChange={(e) => { setWhatIfLoan(Number(e.target.value)); handleSimulateWhatIf(); }} />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Increase Income: ₹{whatIfIncome.toLocaleString()}</label>
+                  <input type="range" min="5000" max="500000" step="1000" value={whatIfIncome} onChange={(e) => { setWhatIfIncome(Number(e.target.value)); handleSimulateWhatIf(); }} />
+                </div>
+              </div>
+              
+              {whatIfResult && (
+                <div style={{ marginTop: '1.5rem', padding: '1rem', background: 'rgba(0,0,0,0.2)', borderRadius: '10px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: '0.9rem' }}>New AI Decision:</span>
+                    <span className={`badge ${whatIfResult.decision === 'Approved' ? 'success' : 'danger'}`}>
+                      {whatIfResult.decision}
+                    </span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.5rem' }}>
+                    <span style={{ fontSize: '0.9rem' }}>Approval Probability:</span>
+                    <span style={{ fontWeight: 800, color: whatIfResult.decision === 'Approved' ? 'var(--success)' : 'white' }}>
+                      {(whatIfResult.approval_probability * 100).toFixed(1)}%
+                    </span>
+                  </div>
                 </div>
               )}
             </div>

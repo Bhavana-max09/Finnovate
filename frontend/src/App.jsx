@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { CreditCard, Home, PiggyBank, ArrowRightLeft, ClipboardCheck, Sun, Moon, LogOut, LayoutDashboard } from 'lucide-react';
+import { CreditCard, Home, PiggyBank, ArrowRightLeft, ClipboardCheck, Sun, Moon, LogOut, LayoutDashboard, ShieldCheck } from 'lucide-react';
 import DashboardView from './views/DashboardView';
 import CardsView from './views/CardsView';
 import LoansView from './views/LoansView';
 import SavingsView from './views/SavingsView';
 import ForexView from './views/ForexView';
 import EligibilityView from './views/EligibilityView';
+import PrivacyView from './views/PrivacyView';
 
 function App() {
   const [user, setUser] = useState(() => {
@@ -93,6 +94,7 @@ function App() {
     { key: 'savings', icon: PiggyBank, label: 'Savings' },
     { key: 'forex', icon: ArrowRightLeft, label: 'Forex' },
     { key: 'eligibility', icon: ClipboardCheck, label: 'Eligibility' },
+    { key: 'privacy', icon: ShieldCheck, label: 'Privacy' },
   ];
 
   const renderContent = () => {
@@ -103,6 +105,7 @@ function App() {
       case 'savings':     return <SavingsView />;
       case 'forex':       return <ForexView />;
       case 'eligibility': return <EligibilityView />;
+      case 'privacy':     return <PrivacyView />;
       default:            return <DashboardView onNavigate={setActiveTab} user={user} />;
     }
   };
