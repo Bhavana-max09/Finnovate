@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { CheckCircle, XCircle, ArrowRight, ArrowLeft, FileText } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { CheckCircle, XCircle, ArrowRight, ArrowLeft, FileText, AlertCircle } from 'lucide-react';
 import bankData from '../data/bank_data.json';
 import { checkLoanEligibility, checkCardEligibility } from '../utils/eligibility.js';
 import API_BASE from '../config.js';
@@ -14,6 +14,7 @@ const STEPS = [
 
 const EligibilityForm = () => {
   const [step, setStep] = useState(0);
+  const fileInputRef = useRef(null);
   const [profile, setProfile] = useState({
     age: 30, employment: 'Salaried', monthly_income: 50000,
     existing_emi: 0, credit_score: 750, loan_history: 'Good',
@@ -101,9 +102,15 @@ const EligibilityForm = () => {
     }
   };
 
-  const simulateDocumentUpload = () => {
+  const simulateDocumentUpload = (e) => {
+    // If files are selected, or if button is clicked manually
+    if (e?.target?.files?.length > 0) {
+       // Proceed with upload
+    }
+    
     setIsLoading(true);
-    setDocsStatus('uploading');
+    setDocsStatus({ uploading: true });
+    
     setTimeout(() => {
       fetch(`${API_BASE}/verify_documents`, { method: 'POST' })
         .then(res => res.json())
@@ -238,13 +245,30 @@ const EligibilityForm = () => {
           <h2>📄 E-KYC Document Upload</h2>
           <p className="card-subtitle">Fast, AI-powered document verification.</p>
           
-          <div style={{ border: '2px dashed rgba(255,255,255,0.1)', borderRadius: '12px', padding: '2rem', textAlign: 'center', marginTop: '1.5rem', background: 'rgba(255,255,255,0.02)' }}>
+          <div 
+            style={{ border: '2px dashed rgba(255,255,255,0.2)', borderRadius: '12px', padding: '2.5rem', textAlign: 'center', marginTop: '1.5rem', background: 'rgba(255,255,255,0.02)', cursor: 'pointer', transition: 'all 0.2s ease' }}
+            onClick={() => !isLoading && !docsStatus?.kyc_status && fileInputRef.current.click()}
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={(e) => { e.preventDefault(); if(!isLoading && !docsStatus?.kyc_status) simulateDocumentUpload(); }}
+          >
+            <input 
+              type="file" 
+              ref={fileInputRef} 
+              style={{ display: 'none' }} 
+              multiple 
+              accept=".pdf,.jpg,.jpeg,.png" 
+              onChange={simulateDocumentUpload} 
+            />
+            
             <FileText size={48} color="var(--accent-primary)" style={{ margin: '0 auto 1rem', opacity: 0.8 }} />
-            <h3 style={{ marginBottom: '0.5rem', fontWeight: 600 }}>Drop your Aadhar & PAN Cards here</h3>
-            <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>Securely encrypted and verified against government databases.</p>
+            <h3 style={{ marginBottom: '0.5rem', fontWeight: 600 }}>Click to browse or drop your Aadhar & PAN Cards here</h3>
+            <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>Securely encrypted and verified against government databases.</p>
             
             {docsStatus?.uploading ? (
-              <div style={{ color: 'var(--accent-teal)' }}>Uploading & Scanning...</div>
+              <div style={{ color: 'var(--accent-teal)', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+                <div className="spinner" style={{ width: '16px', height: '16px', border: '2px solid var(--accent-teal)', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
+                Uploading & Scanning Document...
+              </div>
             ) : docsStatus?.kyc_status ? (
               <div style={{ background: 'rgba(16, 185, 129, 0.1)', border: '1px solid var(--success)', padding: '1rem', borderRadius: '8px' }}>
                 <h4 style={{ color: 'var(--success)', fontWeight: 700, marginBottom: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
@@ -253,8 +277,12 @@ const EligibilityForm = () => {
                 <p style={{ fontSize: '0.85rem' }}>Genuineness Score: <strong>{docsStatus.genuineness_score}%</strong></p>
               </div>
             ) : (
-              <button className="btn-primary" onClick={simulateDocumentUpload} disabled={isLoading}>
-                {isLoading ? 'Verifying...' : 'Simulate Upload & Verify'}
+              <button 
+                className="btn-primary" 
+                onClick={(e) => { e.stopPropagation(); fileInputRef.current.click(); }} 
+                disabled={isLoading}
+              >
+                Browse Files
               </button>
             )}
           </div>
