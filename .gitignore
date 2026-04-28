@@ -15,3 +15,7 @@ backend/venv/
 .vscode/
 .idea/
 *.swp
+
+# Env files
+.env
+*.env
