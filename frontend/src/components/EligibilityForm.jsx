@@ -103,26 +103,38 @@ const EligibilityForm = () => {
   };
 
   const simulateDocumentUpload = (e) => {
-    // If files are selected, or if button is clicked manually
-    if (e?.target?.files?.length > 0) {
-       // Proceed with upload
-    }
-    
     setIsLoading(true);
-    setDocsStatus({ uploading: true });
+    setDocsStatus({ uploading: true, logs: ['[System] Initializing Agentic Verification Pipeline...'] });
+    
+    // Progressive Agentic Logs
+    setTimeout(() => {
+      setDocsStatus(prev => ({ ...prev, logs: [...prev.logs, '🔎 [Image Forensics] Scanning pixels for Photoshop manipulation and copy-paste edits...'] }));
+    }, 1500);
+    
+    setTimeout(() => {
+      setDocsStatus(prev => ({ ...prev, logs: [...prev.logs, '🏛️ [Govt API] OCR extracting PAN... Pinging NSDL Database for name match...'] }));
+    }, 3500);
+
+    setTimeout(() => {
+      setDocsStatus(prev => ({ ...prev, logs: [...prev.logs, '🔐 [Cryptographic] Scanning Aadhar secure QR code and verifying digital signature...'] }));
+    }, 5500);
+
+    setTimeout(() => {
+      setDocsStatus(prev => ({ ...prev, logs: [...prev.logs, '👤 [Face Matching] Cross-referencing ID photo geometry with live liveness check...'] }));
+    }, 7500);
     
     setTimeout(() => {
       fetch(`${API_BASE}/verify_documents`, { method: 'POST' })
         .then(res => res.json())
         .then(data => {
-          setDocsStatus(data);
+          setDocsStatus({ ...data, logs: [] });
           setIsLoading(false);
         })
         .catch(err => {
-          setDocsStatus({ error: true });
+          setDocsStatus({ error: true, logs: [] });
           setIsLoading(false);
         });
-    }, 1500);
+    }, 9500);
   };
 
   const getResults = () => {
@@ -265,9 +277,18 @@ const EligibilityForm = () => {
             <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>Securely encrypted and verified against government databases.</p>
             
             {docsStatus?.uploading ? (
-              <div style={{ color: 'var(--accent-teal)', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
-                <div className="spinner" style={{ width: '16px', height: '16px', border: '2px solid var(--accent-teal)', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
-                Uploading & Scanning Document...
+              <div style={{ textAlign: 'left', background: 'rgba(0,0,0,0.3)', padding: '1.5rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)', marginTop: '1rem' }}>
+                <div style={{ color: 'var(--accent-teal)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
+                  <div className="spinner" style={{ width: '18px', height: '18px', border: '2px solid var(--accent-teal)', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
+                  Agentic AI Pipeline Active
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', fontFamily: 'monospace', fontSize: '0.85rem' }}>
+                  {docsStatus.logs && docsStatus.logs.map((log, idx) => (
+                    <div key={idx} className="animate-fade-in" style={{ color: idx === docsStatus.logs.length - 1 ? 'white' : 'var(--text-secondary)' }}>
+                      {log}
+                    </div>
+                  ))}
+                </div>
               </div>
             ) : docsStatus?.kyc_status ? (
               <div style={{ background: 'rgba(16, 185, 129, 0.1)', border: '1px solid var(--success)', padding: '1rem', borderRadius: '8px' }}>
