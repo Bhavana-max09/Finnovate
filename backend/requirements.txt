@@ -8,7 +8,5 @@ scikit-learn
 scipy
 pydantic
 google-generativeai
-langgraph
-playwright
-playwright-stealth
 python-dotenv
+opencv-python-headless
