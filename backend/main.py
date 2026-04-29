@@ -37,16 +37,24 @@ app.add_middleware(
 )
 
 # Initialize singletons
+print("🚀 Starting module initialization...")
 try:
     core_engine = CoreEngine()
+    print("✅ CoreEngine loaded.")
     xai_module = XAIModule(core_engine.model, core_engine.feature_names)
+    print("✅ XAIModule loaded.")
     bias_auditor = BiasAuditor(core_engine.model, core_engine.feature_names)
+    print("✅ BiasAuditor loaded.")
     proxy_hunter = ProxyHunter()
     compliance_module = ComplianceModule()
     agent_orchestrator = AgentOrchestrator(GEMINI_API_KEY)
     decision_ledger = DecisionLedger()
+    print("✅ All modules initialized successfully.")
 except Exception as e:
-    print(f"Failed to initialize modules: {e}")
+    print(f"❌ CRITICAL ERROR during module initialization: {e}")
+    import traceback
+    traceback.print_exc()
+    # Don't let it exit silently
 
 class ApplicantData(BaseModel):
     DAYS_BIRTH: int
