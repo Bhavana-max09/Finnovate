@@ -28,6 +28,8 @@ const EligibilityForm = () => {
   const [whatIfIncome, setWhatIfIncome] = useState(50000);
   const [whatIfLoan, setWhatIfLoan] = useState(500000);
   const [whatIfResult, setWhatIfResult] = useState(null);
+  const [rehabRoadmap, setRehabRoadmap] = useState(null);
+  const [isRehabLoading, setIsRehabLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value, type } = e.target;
@@ -100,6 +102,35 @@ const EligibilityForm = () => {
     } catch (error) {
       console.error(error);
     }
+  };
+
+  const handleFetchRehabRoadmap = async () => {
+    setIsRehabLoading(true);
+    try {
+      const applicantData = {
+        DAYS_BIRTH: -profile.age * 365,
+        CODE_GENDER: "F",
+        AMT_INCOME_TOTAL: profile.monthly_income * 12,
+        AMT_CREDIT: profile.loan_amount,
+        ZIP_CODE: "10001",
+        NAME_EDUCATION_TYPE: "Higher education",
+        EXT_SOURCE_1: profile.credit_score / 900,
+        EXT_SOURCE_2: profile.credit_score / 900,
+        EXT_SOURCE_3: profile.credit_score / 900,
+      };
+
+      const response = await fetch(`${API_BASE}/rehab_roadmap`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(applicantData)
+      });
+      if (response.ok) {
+        setRehabRoadmap(await response.json());
+      }
+    } catch (error) {
+      console.error(error);
+    }
+    setIsRehabLoading(false);
   };
 
   const simulateDocumentUpload = (e) => {
@@ -346,7 +377,7 @@ const EligibilityForm = () => {
                   </div>
                   <div>
                     <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Default Probability</div>
-                    <div style={{ fontWeight: 600 }}>{aiResult.probability ? (aiResult.probability * 100).toFixed(1) + '%' : 'N/A'}</div>
+                    <div style={{ fontWeight: 600 }}>{aiResult.default_probability != null ? (aiResult.default_probability * 100).toFixed(1) + '%' : 'N/A'}</div>
                   </div>
                   {!aiResult.approved && aiResult.rejection_reasons && (
                     <div style={{ gridColumn: 'span 2' }}>
@@ -395,6 +426,48 @@ const EligibilityForm = () => {
                     <span style={{ fontWeight: 800, color: whatIfResult.decision === 'Approved' ? 'var(--success)' : 'white' }}>
                       {(whatIfResult.approval_probability * 100).toFixed(1)}%
                     </span>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* 💰 Agentic Rehabilitation Roadmap */}
+          {aiResult && !aiResult.approved && (
+            <div className="glass-card" style={{ marginBottom: '1.5rem', background: 'rgba(139, 92, 246, 0.05)', border: '1px solid rgba(139, 92, 246, 0.3)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#a78bfa' }}>💰 Personal Financial Rehabilitation Roadmap</h3>
+                {!rehabRoadmap && (
+                  <button 
+                    className="btn-primary" 
+                    onClick={handleFetchRehabRoadmap} 
+                    disabled={isRehabLoading}
+                    style={{ fontSize: '0.75rem', padding: '0.4rem 0.8rem' }}
+                  >
+                    {isRehabLoading ? 'Generating...' : '🚀 Generate AI Roadmap'}
+                  </button>
+                )}
+              </div>
+              
+              {!rehabRoadmap ? (
+                <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                  Our Agentic Coach can build a custom 6-month plan to help you qualify for this loan. Click the button above to generate.
+                </p>
+              ) : (
+                <div className="animate-fade-in">
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    {rehabRoadmap.milestones.map((m, idx) => (
+                      <div key={idx} style={{ display: 'flex', gap: '1rem', background: 'rgba(0,0,0,0.2)', padding: '1rem', borderRadius: '10px', borderLeft: '4px solid var(--accent-primary)' }}>
+                        <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--accent-primary)', minWidth: '40px' }}>M{m.month}</div>
+                        <div>
+                          <div style={{ fontWeight: 600, fontSize: '0.95rem', marginBottom: '0.2rem' }}>{m.task}</div>
+                          <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>{m.impact}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div style={{ marginTop: '1rem', padding: '1rem', background: 'rgba(139, 92, 246, 0.1)', borderRadius: '8px', fontSize: '0.82rem', border: '1px dashed rgba(139, 92, 246, 0.3)' }}>
+                    <strong>Coach Note:</strong> {rehabRoadmap.coach_advice}
                   </div>
                 </div>
               )}
