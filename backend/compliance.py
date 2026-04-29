@@ -26,9 +26,9 @@ class ComplianceModule:
         if self.df is None or user_index >= len(self.df) or user_index < 0:
             return {"error": "Invalid user index"}
             
-        # Simulate erasure by removing the row
+        # Simulate erasure by removing the row if it exists
         # In a real system, this would trigger database deletion and propagate to backups
-        self.df = self.df.drop(index=user_index)
+        self.df = self.df.drop(index=user_index, errors='ignore')
         
         # We won't save it back to disk to preserve the mock dataset for testing,
         # but we return success.

@@ -1,0 +1,25 @@
+[
+  {
+    "timestamp": 1777420806.1218345,
+    "applicant_snapshot": {
+      "DAYS_BIRTH": -10950,
+      "CODE_GENDER": "F",
+      "AMT_INCOME_TOTAL": 600000.0,
+      "AMT_CREDIT": 500000.0,
+      "ZIP_CODE": "10001",
+      "NAME_EDUCATION_TYPE": "Higher education",
+      "EXT_SOURCE_1": 0.8333333333333334,
+      "EXT_SOURCE_2": 0.8333333333333334,
+      "EXT_SOURCE_3": 0.8333333333333334
+    },
+    "ml_decision": {
+      "default_probability": 0.04569173976778984,
+      "decision": "Approve",
+      "approved": true,
+      "status": "AI Evaluated"
+    },
+    "xai_hash": "95a40fec11052a5e42148e95683edc6e66f8cc2c36dccad1cfa121a960b1b437",
+    "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+    "block_hash": "e15236cea017702fb0fc0e3ed08388b16bae2af79383db61979ee3cd570f5b2e"
+  }
+]
