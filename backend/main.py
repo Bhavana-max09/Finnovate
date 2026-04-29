@@ -36,25 +36,34 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Initialize singletons
-print("🚀 Starting module initialization...")
-try:
-    core_engine = CoreEngine()
-    print("✅ CoreEngine loaded.")
-    xai_module = XAIModule(core_engine.model, core_engine.feature_names)
-    print("✅ XAIModule loaded.")
-    bias_auditor = BiasAuditor(core_engine.model, core_engine.feature_names)
-    print("✅ BiasAuditor loaded.")
-    proxy_hunter = ProxyHunter()
-    compliance_module = ComplianceModule()
-    agent_orchestrator = AgentOrchestrator(GEMINI_API_KEY)
-    decision_ledger = DecisionLedger()
-    print("✅ All modules initialized successfully.")
-except Exception as e:
-    print(f"❌ CRITICAL ERROR during module initialization: {e}")
-    import traceback
-    traceback.print_exc()
-    # Don't let it exit silently
+# Lazy-loaded singletons to prevent Render startup timeouts
+_modules = {}
+
+def get_module(name):
+    if name not in _modules:
+        print(f"📦 Lazy-loading module: {name}...")
+        try:
+            if name == "core_engine":
+                _modules["core_engine"] = CoreEngine()
+            elif name == "xai_module":
+                ce = get_module("core_engine")
+                _modules["xai_module"] = XAIModule(ce.model, ce.feature_names)
+            elif name == "bias_auditor":
+                ce = get_module("core_engine")
+                _modules["bias_auditor"] = BiasAuditor(ce.model, ce.feature_names)
+            elif name == "proxy_hunter":
+                _modules["proxy_hunter"] = ProxyHunter()
+            elif name == "compliance_module":
+                _modules["compliance_module"] = ComplianceModule()
+            elif name == "agent_orchestrator":
+                _modules["agent_orchestrator"] = AgentOrchestrator(GEMINI_API_KEY)
+            elif name == "decision_ledger":
+                _modules["decision_ledger"] = DecisionLedger()
+            print(f"✅ {name} loaded.")
+        except Exception as e:
+            print(f"❌ Error loading {name}: {e}")
+            raise e
+    return _modules[name]
 
 class ApplicantData(BaseModel):
     DAYS_BIRTH: int
@@ -132,6 +141,10 @@ def predict(data: ApplicantData):
 
     df = preprocess(data)
     try:
+        core_engine = get_module("core_engine")
+        xai_module = get_module("xai_module")
+        decision_ledger = get_module("decision_ledger")
+        
         res = core_engine.predict(df)
         res["status"] = "AI Evaluated"
         
@@ -160,6 +173,7 @@ def explain(data: ApplicantData):
 
     df = preprocess(data)
     try:
+        xai_module = get_module("xai_module")
         shap_values = xai_module.get_local_shap(df)
         counterfactuals = xai_module.generate_counterfactuals(df)
         return {
@@ -187,6 +201,7 @@ def explain_narrative(data: ApplicantData):
 
     df = preprocess(data)
     try:
+        xai_module = get_module("xai_module")
         base = xai_module.generate_narrative(df)
         
         if gemini_model:
@@ -234,6 +249,9 @@ def simulate_what_if(data: ApplicantData):
 
     df = preprocess(data)
     try:
+        core_engine = get_module("core_engine")
+        xai_module = get_module("xai_module")
+        
         result = core_engine.predict(df)
         shap_vals = xai_module.get_local_shap(df)
         return {
@@ -310,6 +328,8 @@ async def verify_documents(
 async def get_rehab_roadmap(data: ApplicantData):
     """Generates a personalized financial rehabilitation roadmap."""
     df = preprocess(data)
+    xai_module = get_module("xai_module")
+    agent_orchestrator = get_module("agent_orchestrator")
     shap_summary = xai_module.get_local_shap(df)
     return await agent_orchestrator.generate_rehab_roadmap(data.dict(), shap_summary)
 
@@ -317,6 +337,10 @@ async def get_rehab_roadmap(data: ApplicantData):
 async def run_deliberation(data: ApplicantData):
     """Triggers the multi-agent credit committee deliberation."""
     df = preprocess(data)
+    core_engine = get_module("core_engine")
+    xai_module = get_module("xai_module")
+    agent_orchestrator = get_module("agent_orchestrator")
+    
     ml_result = core_engine.predict(df)
     shap_summary = xai_module.get_local_shap(df)
     return await agent_orchestrator.deliberate(data.dict(), ml_result, shap_summary)
@@ -324,6 +348,7 @@ async def run_deliberation(data: ApplicantData):
 @app.get("/ledger")
 def get_audit_ledger():
     """Returns the immutable decision ledger for regulatory audit."""
+    decision_ledger = get_module("decision_ledger")
     return decision_ledger.get_ledger()
 
 # ──────────────────────────────────────────────
@@ -333,6 +358,7 @@ def get_audit_ledger():
 @app.get("/bias_metrics")
 def get_bias_metrics():
     try:
+        bias_auditor = get_module("bias_auditor")
         return bias_auditor.calculate_fairness_metrics()
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -349,6 +375,7 @@ def stress_test(data: ApplicantData):
 
     df = preprocess(data)
     try:
+        bias_auditor = get_module("bias_auditor")
         return bias_auditor.adversarial_stress_test(df)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -356,6 +383,7 @@ def stress_test(data: ApplicantData):
 @app.get("/proxy_hunter")
 def get_proxies():
     try:
+        proxy_hunter = get_module("proxy_hunter")
         return proxy_hunter.compute_correlations()
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -443,8 +471,10 @@ def get_portfolio_history():
 
 @app.get("/compliance/purpose_limitation")
 def get_purpose_limitation():
+    compliance_module = get_module("compliance_module")
     return compliance_module.get_purpose_limitation()
 
 @app.post("/compliance/erasure/{user_index}")
 def erase_user(user_index: int):
+    compliance_module = get_module("compliance_module")
     return compliance_module.simulate_right_to_erasure(user_index)
